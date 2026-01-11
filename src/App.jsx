@@ -1,6 +1,7 @@
 import Header from "./components/Header";
 import Inputs from "./components/Inputs";
 import { useState, useEffect } from "react";
+import { Weather } from "./Weather";
 
 import "./App.css";
 function App() {
@@ -15,43 +16,40 @@ function App() {
   const [isResult, setIsResult] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [value, setValue] = useState("");
-
+  const weather = new Weather();
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
+    if (!("geolocation" in navigator)) {
+      setError("المتصفح لا يدعم الحصول على الموقع");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
-          const apiKey = "3da8e3a22c5f998124c0e3ffbe1c2cff";
-          const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
-          try {
-            const res = await fetch(url);
-            const newData = await res.json();
-            setData({
-              ...data,
-              temperature: newData.main.temp,
-              concreteTemperature: 25,
-              humidity: newData.main.humidity,
-              windSpead: newData.wind.speed,
-              city: newData.name,
-            });
-            // eslint-disable-next-line no-unused-vars
-          } catch (err) {
-            setError("حدث خطأ أثناء جلب بيانات الطقس");
-          }
-        },
-        () => {
-          setError("يجب السماح للتطبيق بالوصول إلى الموقع");
+          const weatherData = await weather.getWeather(lat, lon);
+          setData((prev) => ({
+            ...prev,
+            temperature: weatherData.temperature,
+            concreteTemperature: 25,
+            humidity: weatherData.humidity,
+            windSpead: weatherData.windSpeed * 3.6,
+            city: weatherData.city,
+          }));
+          // eslint-disable-next-line no-unused-vars
+        } catch (err) {
+          setError("حدث خطأ أثناء جلب بيانات الطقس");
         }
-      );
-    } else {
-      setError("المتصفح لا يدعم الحصول على الموقع");
-    }
+      },
+      () => {
+        setError("يجب السماح للتطبيق بالوصول إلى الموقع");
+      }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const handleData = (id, value) => {
     const update = { ...data };
     if (id == "Temperature") {
