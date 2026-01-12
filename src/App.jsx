@@ -1,5 +1,4 @@
 import NavBar from "./components/NavBar";
-// import { useState } from "react";
 import "./App.css";
 import HomePage from "./components/HomePage";
 import Forecast from "./components/Forecast";
@@ -12,7 +11,10 @@ function App() {
     <>
       <NavBar />
       {isHome ? <HomePage /> : <Forecast />}
-      <div className={`${showMobile ? "show-mobile" : "hidden"}`}>
+      <div
+        className={`${showMobile ? "show-mobile" : "hidden"}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <DisktopMenu />
       </div>
     </>

@@ -174,7 +174,6 @@ body {
   left: 0;
   right: 0;
   width: 100%;
-  /* max-height: 20vh; */
 }
 
 .copy-right {
@@ -210,7 +209,7 @@ body {
   }
   .container {
     width: 100%;
-    /* height: 100%; */
+    height: 100vh;
     overflow: hidden;
     margin-top: 8.5%;
   }
@@ -233,17 +232,19 @@ body {
     align-items: start;
     width: 100%;
     justify-content: start;
+    margin-top: 20px;
+    gap: 50px;
   }
 
   .show-mobile {
     background-color: black;
     width: 60%;
     position: absolute;
-    top: 48px;
+    top: 47px;
     left: 0;
     display: flex;
-    height: 90vh;
-    border-radius: 0 8px 0 0;
+    height: 50vh;
+    border-radius: 0 8px 8px 0;
   }
 
   .disk-show p {
