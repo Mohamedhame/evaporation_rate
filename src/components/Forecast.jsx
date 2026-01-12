@@ -10,28 +10,27 @@ import "react-datepicker/dist/react-datepicker.css";
 const Forecast = () => {
   const { setIsHome, setData, showMobile, setShowMobile, setIsResult } =
     useAppContext();
+
   const [selectedDate, setSelectedDate] = useState(date());
   const [isLoading, setIsLoading] = useState(false);
-
-  const [weather, setWeather] = useState({
-    city: "",
-    weatherList: [],
-  });
+  const [weather, setWeather] = useState({ city: "", weatherList: [] });
   const [error, setError] = useState("");
 
-  const today = new Date();
-  const maxDate = new Date();
-  maxDate.setDate(today.getDate() + 5);
-  const selected = new Date(selectedDate);
-
+  // التاريخ اليوم وحد أقصى 5 أيام
   const todayOnly = new Date();
   todayOnly.setHours(0, 0, 0, 0);
 
+  const maxDate = new Date();
+  maxDate.setDate(todayOnly.getDate() + 5);
+  maxDate.setHours(0, 0, 0, 0);
+
+  const selected = new Date(selectedDate);
   selected.setHours(0, 0, 0, 0);
 
+  // جلب بيانات الطقس
   useEffect(() => {
     const fetchForecast = async () => {
-      setIsLoading(true); // ⬅️ بداية التحميل
+      setIsLoading(true); // تشغيل الـ spinner
       setError("");
 
       const result = await getWeather(true, selectedDate);
@@ -46,12 +45,13 @@ const Forecast = () => {
         });
       }
 
-      setIsLoading(false); // ⬅️ نهاية التحميل
+      setIsLoading(false); // إيقاف الـ spinner بعد التحميل
     };
 
     fetchForecast();
   }, [selectedDate]);
 
+  // الانتقال من forecast للـ HomePage
   const goToHome = (data) => {
     setData((prev) => ({
       ...prev,
@@ -69,9 +69,7 @@ const Forecast = () => {
     <div
       className="container"
       onClick={() => {
-        if (showMobile) {
-          setShowMobile(false);
-        }
+        if (showMobile) setShowMobile(false);
       }}
     >
       <div className="city">
@@ -82,37 +80,51 @@ const Forecast = () => {
         />
       </div>
 
-      {/* خطأ */}
+      {/* 1️⃣ خطأ من API */}
       {error && <p className="error">{error}</p>}
 
-      {/* Spinner */}
-      {isLoading && <div className="spinner"></div>}
-
-      {/* البيانات */}
-      {!isLoading && !error && weather.weatherList.length > 0 && (
-        <div className="container-card">
-          {weather.weatherList.map((item, index) => {
-            const data = {
-              temperature: item.temperature,
-              concreteTemperature: item.temperature,
-              humidity: item.humidity,
-              windSpeed: item.windSpeed,
-            };
-
-            return (
-              <Card
-                key={index}
-                hour={item.dateTime.split(" ")[1].slice(0, 5)}
-                temperature={item.temperature}
-                humidity={item.humidity}
-                windSpeed={item.windSpeed}
-                value={calculateData(data).value}
-                goToHome={() => goToHome(item)}
-              />
-            );
-          })}
-        </div>
+      {/* 2️⃣ خطأ في التاريخ */}
+      {!error && selected < todayOnly && (
+        <p className="error">لا يمكن اختيار تاريخ قبل اليوم الحالي</p>
       )}
+      {!error && selected > maxDate && (
+        <p className="error">يمكنك اختيار تاريخ خلال 5 أيام فقط</p>
+      )}
+
+      {/* 3️⃣ التحميل */}
+      {!error && selected >= todayOnly && selected <= maxDate && isLoading && (
+        <div className="spinner"></div>
+      )}
+
+      {/* 4️⃣ عرض البيانات */}
+      {!error &&
+        selected >= todayOnly &&
+        selected <= maxDate &&
+        !isLoading &&
+        weather.weatherList.length > 0 && (
+          <div className="container-card">
+            {weather.weatherList.map((item, index) => {
+              const data = {
+                temperature: item.temperature,
+                concreteTemperature: item.temperature,
+                humidity: item.humidity,
+                windSpeed: item.windSpeed,
+              };
+
+              return (
+                <Card
+                  key={index}
+                  hour={item.dateTime.split(" ")[1].slice(0, 5)}
+                  temperature={item.temperature}
+                  humidity={item.humidity}
+                  windSpeed={item.windSpeed}
+                  value={calculateData(data).value}
+                  goToHome={() => goToHome(item)}
+                />
+              );
+            })}
+          </div>
+        )}
 
       <div className="footer">
         <div className="copy-right">Designed by Mohamed Hamed</div>
@@ -120,4 +132,5 @@ const Forecast = () => {
     </div>
   );
 };
+
 export default Forecast;
