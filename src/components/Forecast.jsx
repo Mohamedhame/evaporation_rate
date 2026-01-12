@@ -11,6 +11,8 @@ const Forecast = () => {
   const { setIsHome, setData, showMobile, setShowMobile, setIsResult } =
     useAppContext();
   const [selectedDate, setSelectedDate] = useState(date());
+  const [isLoading, setIsLoading] = useState(false);
+
   const [weather, setWeather] = useState({
     city: "",
     weatherList: [],
@@ -28,21 +30,9 @@ const Forecast = () => {
   selected.setHours(0, 0, 0, 0);
 
   useEffect(() => {
-    // تحقق من التاريخ قبل أي fetch
-    if (selected < todayOnly) {
-      setError("لا يمكن اختيار تاريخ قبل اليوم الحالي");
-      setWeather({ city: "", weatherList: [] });
-      return;
-    }
-
-    if (selected > maxDate) {
-      setError("يمكنك اختيار تاريخ خلال 5 أيام فقط");
-      setWeather({ city: "", weatherList: [] });
-      return;
-    }
-
     const fetchForecast = async () => {
-      setError(""); // مسح أي خطأ قديم
+      setIsLoading(true); // ⬅️ بداية التحميل
+      setError("");
 
       const result = await getWeather(true, selectedDate);
 
@@ -55,10 +45,11 @@ const Forecast = () => {
           weatherList: result.weatherList,
         });
       }
+
+      setIsLoading(false); // ⬅️ نهاية التحميل
     };
 
     fetchForecast();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
   const goToHome = (data) => {
@@ -94,13 +85,11 @@ const Forecast = () => {
       {/* خطأ */}
       {error && <p className="error">{error}</p>}
 
-      {/* تحميل حقيقي فقط */}
-      {!error && weather.weatherList.length === 0 && (
-        <div className="spinner"></div>
-      )}
+      {/* Spinner */}
+      {isLoading && <div className="spinner"></div>}
 
-      {/* بيانات */}
-      {!error && weather.weatherList.length > 0 && (
+      {/* البيانات */}
+      {!isLoading && !error && weather.weatherList.length > 0 && (
         <div className="container-card">
           {weather.weatherList.map((item, index) => {
             const data = {
