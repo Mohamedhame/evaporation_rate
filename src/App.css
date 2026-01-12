@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   background-color: #333;
   height: 100%;
@@ -17,18 +18,42 @@ body {
   border-radius: 12px;
 }
 
-.head {
+.nav-bar {
   width: 100%;
   background-color: black;
   color: white;
   padding: 10px;
   border-radius: 0 0 8px 8px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.head p {
-  font-size: 20px;
-  font-weight: bold;
+.nav-bar .menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.menu p,
+.disk-show p {
+  background-color: #8694a369;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.menu p:hover {
+  scale: calc(1.1);
+}
+
+.menu .active,
+.disk-show .active {
+  background-color: rgba(172, 255, 47, 0.399);
+  scale: calc(1.1);
 }
 
 .city {
@@ -39,6 +64,15 @@ body {
   padding: 10px;
   border-radius: 12px;
   color: #fff;
+}
+
+.city input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: #fff;
+  width: 100%;
+  text-align: center;
 }
 
 .inputs,
@@ -138,6 +172,20 @@ body {
   border-radius: 8px 8px 0 0;
 }
 
+.disk-show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.show-mobile {
+  display: none;
+}
+
+.mobile {
+  display: none;
+}
 
 @media (max-width: 700px) {
   body {
@@ -153,6 +201,37 @@ body {
   .copy-right {
     background-color: #333;
   }
+
+  .disk {
+    display: none;
+  }
+
+  .mobile {
+    display: flex;
+  }
+
+  .disk-show {
+    flex-direction: column;
+    margin:20px 0 0 5px;
+    align-items: start;
+    width: 100%;
+    justify-content: start;
+  }
+
+  .show-mobile {
+    background-color: black;
+    width: 60%;
+    position: absolute;
+    top: 48px;
+    left: 0;
+    display: flex;
+    height: 90vh;
+    border-radius: 0 8px 0 0;
+  }
+  
+  .disk-show p{
+    width: 80%;
+  }
 }
 
 .error {
@@ -166,11 +245,38 @@ body {
   border-radius: 8px;
 }
 
-
 .footer {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
+}
+
+.container-card {
+  width: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: auto;
+  flex-wrap: wrap;
+}
+
+.card {
+  border: 1px solid #333;
+  padding: 8px;
+  border-radius: 8px;
+  color: #fff;
+  margin: 10px auto;
+}
+
+.card .hour {
+  text-align: center;
+}
+
+.card .item-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
