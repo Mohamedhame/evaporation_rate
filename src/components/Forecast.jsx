@@ -4,9 +4,12 @@ import { date } from "../dateNow";
 import { getWeather } from "../getWeather";
 import { calculateData } from "../calculate";
 import { useAppContext } from "../AppContext";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Forecast = () => {
-  const { setIsHome, setData, showMobile, setShowMobile } = useAppContext();
+  const { setIsHome, setData, showMobile, setShowMobile, setIsResult } =
+    useAppContext();
   const [selectedDate, setSelectedDate] = useState(date());
   const [weather, setWeather] = useState({
     city: "",
@@ -25,7 +28,22 @@ const Forecast = () => {
   selected.setHours(0, 0, 0, 0);
 
   useEffect(() => {
+    // تحقق من التاريخ قبل أي fetch
+    if (selected < todayOnly) {
+      setError("لا يمكن اختيار تاريخ قبل اليوم الحالي");
+      setWeather({ city: "", weatherList: [] });
+      return;
+    }
+
+    if (selected > maxDate) {
+      setError("يمكنك اختيار تاريخ خلال 5 أيام فقط");
+      setWeather({ city: "", weatherList: [] });
+      return;
+    }
+
     const fetchForecast = async () => {
+      setError(""); // مسح أي خطأ قديم
+
       const result = await getWeather(true, selectedDate);
 
       if (result.status === "failure") {
@@ -36,11 +54,11 @@ const Forecast = () => {
           city: result.city,
           weatherList: result.weatherList,
         });
-        setError("");
       }
     };
 
     fetchForecast();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
   const goToHome = (data) => {
@@ -52,6 +70,7 @@ const Forecast = () => {
       windSpeed: data.windSpeed,
       fromForecast: true,
     }));
+    setIsResult(false);
     setIsHome(true);
   };
 
@@ -65,22 +84,25 @@ const Forecast = () => {
       }}
     >
       <div className="city">
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
+        <DatePicker
+          selected={new Date(selectedDate)}
+          onChange={(date) => setSelectedDate(date.toISOString().split("T")[0])}
+          dateFormat="dd-MM-yyyy"
         />
       </div>
 
+      {/* خطأ */}
       {error && <p className="error">{error}</p>}
 
-      <div className="container-card">
-        {selected < todayOnly ? (
-          <div className="error">لا يمكن اختيار تاريخ قبل اليوم الحالي</div>
-        ) : selected > maxDate ? (
-          <div className="error">يمكنك اختيار تاريخ خلال 5 أيام فقط</div>
-        ) : (
-          weather.weatherList.map((item, index) => {
+      {/* تحميل حقيقي فقط */}
+      {!error && weather.weatherList.length === 0 && (
+        <div className="spinner"></div>
+      )}
+
+      {/* بيانات */}
+      {!error && weather.weatherList.length > 0 && (
+        <div className="container-card">
+          {weather.weatherList.map((item, index) => {
             const data = {
               temperature: item.temperature,
               concreteTemperature: item.temperature,
@@ -99,8 +121,12 @@ const Forecast = () => {
                 goToHome={() => goToHome(item)}
               />
             );
-          })
-        )}
+          })}
+        </div>
+      )}
+
+      <div className="footer">
+        <div className="copy-right">Designed by Mohamed Hamed</div>
       </div>
     </div>
   );

@@ -12,7 +12,6 @@ function App() {
     <>
       <NavBar />
       {isHome ? <HomePage /> : <Forecast />}
-
       <div className={`${showMobile ? "show-mobile" : "hidden"}`}>
         <DisktopMenu />
       </div>
