@@ -187,6 +187,10 @@ body {
   display: none;
 }
 
+  .hidden {
+    display: none;
+  }
+
 @media (max-width: 700px) {
   body {
     background-color: #47515d;
@@ -228,7 +232,7 @@ body {
     height: 90vh;
     border-radius: 0 8px 0 0;
   }
-  
+
   .disk-show p{
     width: 80%;
   }
